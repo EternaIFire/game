@@ -1,5 +1,5 @@
 // 0.0.1b
-// Buttons are now
+// I just need the button art, E
 
 let WIDTH = 700;
 let HEIGHT = 500;
