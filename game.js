@@ -1,5 +1,6 @@
 // 0.0.1b
 // I just need the button art, E
+// sorry i got in tubble and i can't be on till tomorrow I'll do it then
 
 let WIDTH = 700;
 let HEIGHT = 500;
