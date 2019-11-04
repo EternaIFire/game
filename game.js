@@ -2,6 +2,7 @@
 // Buttons now rotate and have actual functionality.
 // With some placeholder button art, the basic main menu will be done.
 // I propose that smooth scene transitions are added next.
+// Ok, can u do that and I'll do the buttons now?
 
 let WIDTH = 700, HEIGHT = 500;
 let buttonDimX = 200, buttonDimY = 150, screen = 0;
