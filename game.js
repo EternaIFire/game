@@ -1,42 +1,75 @@
 // 0.0.1b
-// I just need the button art, E
-// sorry i got in tubble and i can't be on till tomorrow I'll do it then
+// Buttons now rotate and have actual functionality.
+// With some placeholder button art, the basic main menu will be done.
+// I propose that smooth scene transitions are added next.
 
-let WIDTH = 700;
-let HEIGHT = 500;
-let menu = [];
-let img;
-let screen = 0;
+let WIDTH = 700, HEIGHT = 500;
+let buttonDimX = 200, buttonDimY = 150, screen = 0;
+let timeStarted = Date.now(), menu = [];
+let backButton, img;
+
+function ButtonTransition(finalX_, delay_) {
+	this.x = -buttonDimX;
+	this.finalX = finalX_;
+	this.delay = delay_;
+	
+	this.setDelay = del => {
+		this.delay = del;
+		return this;
+	}
+	
+	this.update = () => {
+		if (this.x !== this.finalX && Date.now() - timeStarted > this.delay) this.x += (this.finalX - this.x) / 20;		
+		return this.x;
+	}
+}
 
 function MenuItem(x_, y_, ySpeed_, yPower_, img_, id_) {
-	this.dimX = 400 * 0.5; // We should keep it this way until the final buttons are ready
-	this.dimY = 300 * 0.5;
+	this.dimX = buttonDimX;
+	this.dimY = buttonDimY;
 	this.x = x_;
 	this.y = y_;
 	this.ySpeed = ySpeed_;
 	this.yPower = yPower_;
 	this.img = img_;
 	this.id = id_;
-	this.finalY = this.y;
+	this.yPos = this.y;
+	this.xPos = 0;
+	this.tint = false;
 	
 	this.clicked = () => {	
-		screen = (this.id == 2) ? 1 : 2;
+		if (this.id === 2) {
+			screen = 1;
+		} else if (this.id === 3) {
+			screen = 2;
+		} else if (this.id === 4) {
+			screen = 0;
+		}
+	}
+	
+	this.update = () => {
+		this.xPos = (typeof this.x === "number") ? this.x : this.x.update();
+		
+		this.yPos = this.y + sin(frameCount * this.ySpeed) * this.yPower;
+		
+		if (mouseX >= this.xPos - this.dimX / 2 && mouseX <= this.xPos + this.dimX / 2 && mouseY >= this.y - this.dimY / 3 && mouseY <= this.yPos + this.dimY / 5) {
+			this.tint = true;
+			
+			if (mouseIsPressed) {
+				this.clicked();
+			}
+		} else {
+			if (this.tint) this.tint = false;
+		}
 	}
 	
 	this.render = () => {
-		this.finalY = this.y + sin(frameCount * this.ySpeed) * this.yPower;
-		
-		if (mouseIsPressed) {
-			if (mouseX >= this.x - this.dimX / 2 && mouseX <= this.x + this.dimX / 2) {
-				if (mouseY >= this.y - this.dimY / 2 && mouseY <= this.finalY + this.dimY / 2) {
-					this.clicked();
-				}
-			}
-		}
+		this.update();
 		
 		push();
+		if (this.tint) tint(255, 127);
 		this.img.resize(this.dimX, this.dimY);
-		translate(this.x, this.finalY);
+		translate(this.xPos, this.yPos);
 		rotate(PI / 180 * sin(frameCount / 25) * 2);
 		imageMode(CENTER);
 		image(this.img, 0, 0, 0, 0);
@@ -44,28 +77,41 @@ function MenuItem(x_, y_, ySpeed_, yPower_, img_, id_) {
 	}
 }
 
+makeTransition = (pos, delay) => {
+	return new ButtonTransition(pos, delay);
+}
+
 preload = () => {
 	img = loadImage("https://cors-anywhere.herokuapp.com/http://pixelartmaker.com/art/9b4cf54d4690c1d.png");
 }
 
 setup = () => {
-	menu.push(new MenuItem(WIDTH / 2, 100, 0.05, 10, img, 1));
-	menu.push(new MenuItem(WIDTH / 2, 250, 0.05, 10, img, 2));
-	menu.push(new MenuItem(WIDTH / 2, 350, 0.05, 10, img, 3));
+	menu.push(new MenuItem(makeTransition(WIDTH / 2, 0), 100, 0.05, 10, img, 1));
+	menu.push(new MenuItem(makeTransition(WIDTH / 2, 500), 250, 0.05, 10, img, 2));
+	menu.push(new MenuItem(makeTransition(WIDTH / 2, 1000), 350, 0.05, 10, img, 3));
+	backButton = new MenuItem(WIDTH / 2, 50, 0.05, 10, img, 4);	
 	createCanvas(WIDTH, HEIGHT);
 }
 
 draw = () => {
 	background(250);
 	
-	if (screen == 0) {
-		menu.forEach((item) => { // Render all menu items
+	menu.forEach((item) => {
+		if (screen == 0) {
 			item.render();
-		});
-	} else if (screen == 1) {
+		} else {
+			item.update();
+		}
+	});
+	
+	if (screen == 1) {
+		backButton.render();
+		textAlign(CENTER);
 		textSize(50);
 		text("GAME", WIDTH / 2, HEIGHT / 2);
 	} else if (screen == 2) {
+		backButton.render();
+		textAlign(CENTER);
 		textSize(50);
 		text("CREDITS", WIDTH / 2, HEIGHT / 2);
 	}
