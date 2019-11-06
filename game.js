@@ -1,5 +1,5 @@
 // 0.0.2
-
+// I'm not doing the buttons yet, once we get more done I'll do it so i can base it more of the theme
 let WIDTH = 700, HEIGHT = 500;
 let buttonDimX = 200, buttonDimY = 150, screen = 0;
 let timeStarted = Date.now(), menu = [];
