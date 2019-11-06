@@ -1,13 +1,26 @@
-// 0.0.1b
-// Buttons now rotate and have actual functionality.
-// With some placeholder button art, the basic main menu will be done.
-// I propose that smooth scene transitions are added next.
-// Ok, can u do that and I'll do the buttons now?
+// 0.0.2
 
 let WIDTH = 700, HEIGHT = 500;
 let buttonDimX = 200, buttonDimY = 150, screen = 0;
 let timeStarted = Date.now(), menu = [];
-let backButton, img;
+let backButton, img, transition, fps;
+
+function SceneTransition() {
+	this.y = -HEIGHT;
+	
+	this.update = () => {
+		this.y += 30;
+		
+		if (this.y >= HEIGHT) transition = undefined;
+	}
+	
+	this.render = () => {
+		this.update();
+
+		fill(0);
+		rect(0, this.y, WIDTH, HEIGHT);
+	}
+}
 
 function ButtonTransition(finalX_, delay_) {
 	this.x = -buttonDimX;
@@ -40,11 +53,23 @@ function MenuItem(x_, y_, ySpeed_, yPower_, img_, id_) {
 	
 	this.clicked = () => {	
 		if (this.id === 2) {
-			screen = 1;
+			sceneTransition();
+			
+			setTimeout(() => {
+				screen = 1;
+			}, 450);
 		} else if (this.id === 3) {
-			screen = 2;
+			sceneTransition();
+			
+			setTimeout(() => {
+				screen = 2;
+			}, 450);
 		} else if (this.id === 4) {
-			screen = 0;
+			sceneTransition();
+			
+			setTimeout(() => {
+				screen = 0;
+			}, 450);
 		}
 	}
 	
@@ -78,7 +103,11 @@ function MenuItem(x_, y_, ySpeed_, yPower_, img_, id_) {
 	}
 }
 
-makeTransition = (pos, delay) => {
+sceneTransition = () => {
+	transition = new SceneTransition();
+}
+
+makeButtonTransition = (pos, delay) => {
 	return new ButtonTransition(pos, delay);
 }
 
@@ -87,9 +116,9 @@ preload = () => {
 }
 
 setup = () => {
-	menu.push(new MenuItem(makeTransition(WIDTH / 2, 0), 100, 0.05, 10, img, 1));
-	menu.push(new MenuItem(makeTransition(WIDTH / 2, 500), 250, 0.05, 10, img, 2));
-	menu.push(new MenuItem(makeTransition(WIDTH / 2, 1000), 350, 0.05, 10, img, 3));
+	menu.push(new MenuItem(makeButtonTransition(WIDTH / 2, 0), 100, 0.05, 10, img, 1));
+	menu.push(new MenuItem(makeButtonTransition(WIDTH / 2, 500), 250, 0.05, 10, img, 2));
+	menu.push(new MenuItem(makeButtonTransition(WIDTH / 2, 1000), 350, 0.05, 10, img, 3));
 	backButton = new MenuItem(WIDTH / 2, 50, 0.05, 10, img, 4);	
 	createCanvas(WIDTH, HEIGHT);
 }
@@ -98,6 +127,8 @@ draw = () => {
 	background(250);
 	
 	menu.forEach((item) => {
+		if (frameCount % 20 == 0) fps = round(getFrameRate());
+		
 		if (screen == 0) {
 			item.render();
 		} else {
@@ -116,4 +147,6 @@ draw = () => {
 		textSize(50);
 		text("CREDITS", WIDTH / 2, HEIGHT / 2);
 	}
+	
+	if (transition) transition.render();
 }
