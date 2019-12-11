@@ -1,12 +1,9 @@
 // 0.0.2
-// I'm not doing the buttons yet, once we get more done I'll do it so i can base it more of the theme
-
-// Hey, lets get back to work on this! whats the dif between "let" and "var" ?
-
 
 let WIDTH = 700, HEIGHT = 500;
-let buttonDimX = 200, buttonDimY = 150, screen = 0;
+let buttonDimX = 200, buttonDimY = 150, screen = 0, time = 0;
 let timeStarted = Date.now(), menu = [];
+let onTransition = false;
 let backButton, img, transition, fps;
 
 function SceneTransition() {
@@ -15,7 +12,11 @@ function SceneTransition() {
 	this.update = () => {
 		this.y += 30;
 		
-		if (this.y >= HEIGHT) transition = undefined;
+		if (this.y >= HEIGHT) {
+			transition = undefined;
+			onTransition = false;
+			time = 0;
+		}
 	}
 	
 	this.render = () => {
@@ -55,25 +56,13 @@ function MenuItem(x_, y_, ySpeed_, yPower_, img_, id_) {
 	this.xPos = 0;
 	this.tint = false;
 	
-	this.clicked = () => {	
+	this.clicked = () => {
 		if (this.id === 2) {
-			sceneTransition();
-			
-			setTimeout(() => {
-				screen = 1;
-			}, 450);
+			handleTransition(1);
 		} else if (this.id === 3) {
-			sceneTransition();
-			
-			setTimeout(() => {
-				screen = 2;
-			}, 450);
+			handleTransition(2)
 		} else if (this.id === 4) {
-			sceneTransition();
-			
-			setTimeout(() => {
-				screen = 0;
-			}, 450);
+			handleTransition(0);
 		}
 	}
 	
@@ -108,7 +97,19 @@ function MenuItem(x_, y_, ySpeed_, yPower_, img_, id_) {
 }
 
 sceneTransition = () => {
+	onTransition = true;
 	transition = new SceneTransition();
+}
+
+handleTransition = (screen_) => {
+	if (!onTransition) {
+		sceneTransition();
+		time = 18000 / round(getFrameRate());
+	}
+	
+	setTimeout(() => {
+		screen = screen_;
+	}, time);
 }
 
 makeButtonTransition = (pos, delay) => {
@@ -130,9 +131,7 @@ setup = () => {
 draw = () => {
 	background(250);
 	
-	menu.forEach((item) => {
-		if (frameCount % 20 == 0) fps = round(getFrameRate());
-		
+	menu.forEach((item) => {	
 		if (screen == 0) {
 			item.render();
 		} else {
