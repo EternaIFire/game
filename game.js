@@ -4,7 +4,7 @@ let WIDTH = 700, HEIGHT = 500;
 let buttonDimX = 165, buttonDimY = 47, screen = 0, time = 0;
 let timeStarted = Date.now(), menu = [];
 let onTransition = false;
-let backButton, playImg, creditsImg, transition, fps, player, level, scrollX, scrollY;
+let backButton, playImg, creditsImg, transition, fps, player, level, scrollX, scrollY, dir, center;
 
 class Player {
 	update = () => {	
@@ -12,7 +12,7 @@ class Player {
 		this.posY += this.velY;
 		this.falling++;
 		
-		this.velX *= 0.82;	
+		this.velX *= 0.78;	
 		this.posX += this.velX;
 		
 		while (!touchingGround()) {
@@ -21,12 +21,22 @@ class Player {
 			this.falling = 0;
 		}
 		
-		if (keyIsDown(LEFT_ARROW)) this.velX -= 1;
-		if (keyIsDown(RIGHT_ARROW)) this.velX += 1;
-		if (keyIsDown(UP_ARROW) && this.falling < 3) this.velY = -6;
+		if (keyIsDown(LEFT_ARROW)) {
+			this.velX -= 1.5;
+			dir = -90;
+		}
+		
+		if (keyIsDown(RIGHT_ARROW)) {
+			this.velX += 1.5;
+			dir = 90;
+		}
+		
+		if (keyIsDown(UP_ARROW) && this.falling < 4) this.velY = -6;
 
 		if (this.posY > 500) reset();
-		scrollX = this.posX;
+		scrollX += (this.posX + center - scrollX) * 0.3;
+		scrollY += (this.posY - scrollY);
+		center += ((dir / 2) - center) * 0.3;
 	}
 
 	draw = () => {
@@ -172,6 +182,8 @@ setup = () => {
 reset = () => {
 	scrollX = 0;
 	scrollY = 0;
+	dir = 90;
+	center = 0;
 	player = new Player(0, -50);
 }
 
