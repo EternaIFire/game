@@ -35,7 +35,6 @@ class Player {
 
 		if (this.posY > 500) reset();
 		scrollX += (this.posX + center - scrollX) * 0.3;
-		scrollY += (this.posY - scrollY);
 		center += ((dir / 2) - center) * 0.3;
 	}
 
